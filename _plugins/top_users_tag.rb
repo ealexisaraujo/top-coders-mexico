@@ -29,43 +29,34 @@ module Jekyll
         end
 
         def countRepos(user)
-            size = 0
-            begin
-                (1..3).each do |i|
-                
-                    uri = URI.parse("https://api.github.com/users/#{user}/repos?#{authorization_string}&per_page=100&page=#{i}")
+            uri = URI.parse("https://api.github.com/users/#{user}/repos?#{authorization_string}&per_page=100")
 
-                    http = Net::HTTP.new(uri.host, uri.port)
-                    http.use_ssl = true
+            http = Net::HTTP.new(uri.host, uri.port)
+            http.use_ssl = true
 
-                    request = Net::HTTP::Get.new(uri)
-                    request["Accept"] = 'application/vnd.github.cloak-preview'
+            request = Net::HTTP::Get.new(uri)
+            request["Accept"] = 'application/vnd.github.cloak-preview'
 
-                    response = http.request(request)
+            response = http.request(request)
 
-                    repos = JSON.parse(response.body)
+            repos = JSON.parse(response.body)
 
-                    repos.each do |repo|
-                        getTechnologies(user, repo["name"])
-                    end
+            repos.each do |repo|
+                getTechnologies(user, repo["name"])
+            end
 
-                    repos = repos.select do | repo |
-                    !repo["fork"]
-                    end
+            repos = repos.select do | repo |
+                !repo["fork"]
+            end
+            
 
-                    size += repos.size
-
-               end
-            return size
-          rescue
-            return size
-          end
+            return repos.size
         end
 
         def countCommits(user)
             now = Time.new
             date_one_year_ago = "#{(now.year - 1).to_s}-#{now.month.to_s.rjust(2, '0')}-#{now.day.to_s.rjust(2, '0')}"
-            uri = URI.parse("https://api.github.com/search/commits?q=author:#{user} committer-date:>#{date_one_year_ago}&#{authorization_string}&per_page=100")
+            uri = URI.parse("https://api.github.com/search/commits?q=author:#{user} committer-date:>#{date_one_year_ago}&#{authorization_string}")
 
             http = Net::HTTP.new(uri.host, uri.port)
             http.use_ssl = true
@@ -121,18 +112,18 @@ module Jekyll
             max_public_repos = 0
             max_issues = 0
 
-            (1..3).each do |i|
+            (1..2).each do |i|
 
-                sleep(60)
+                sleep(30)
 
-                uri = URI.parse("https://api.github.com/search/users?q=location:mexico location:mexico followers:>10&per_page=10&page=#{i}&sort=followers&order=desc&#{authorization_string}")
+                uri = URI.parse("https://api.github.com/search/users?q=location:mexico followers:>10&per_page=30x&page=#{i}&sort=followers&order=desc&#{authorization_string}")
 
                 response = Net::HTTP.get_response(uri)
                 users = JSON.parse(response.body)
 
                 users["items"].each do |user|
 
-                    sleep(20)
+                    sleep(5)
 
                     data = getUserData(user["login"])
 
@@ -178,41 +169,33 @@ module Jekyll
 
             languages = @technologies.sort_by {|k,v| v}.reverse.first(15).to_h 
             sum = languages.values.reduce(:+).to_f
+
             languages.each do |language, value|
                 languages[language] = (value/sum * 100).round(2)
             end
-            
+
             return @top_users.sort_by {|obj| obj[:score]}.reverse, languages
         end
 
         def render(context)
-            users, languages = getTopUsersData 
+            users, languages = getTopUsersData
             element = "<script> draw_languages_chart(" + languages.to_json + ") </script>\n"
 
             element += "<div class='UsersTableContainer'> <table>\n"
-            element += "<thead><th><td>User</td>"
-            element += "<td>Info</td><td>Score</td>"
-            element += "<td>Followers</td>"
-            element += "<td>Commits</td>"
-            element += "<td>Stars</td><td>Repos</td>"
-            element += "<td>Issues/PR</td></th><thead>\n"
+            element += "<thead><th><td>User</td><td>Info</td><td>Followers</td><td>Commits</td><td>Stars</td><td>Repos</td><td>Issues/PR</td></th><thead>\n"
             element += "<tbody>"
             users.each_with_index do |user, i|
                 element += "<tr><td>#{i + 1}</td>"
                 element += "<td><img class='User__image' src='#{user[:pic]}'><br/><a href='#{user[:url]}'>#{user[:id]}</a></td>"
                 element += "<td><b>#{user[:name]}</b><br/>#{user[:email]}<br/><i>#{user[:company]}</i></td>"
-                element += "<td>#{user[:score].round(4)}</td>"
-                element += "<td>#{user[:followers]}</td>"
-                element += "<td>#{user[:commits]}</td>"
-                element += "<td>#{user[:stars]}</td>"
-                element += "<td>#{user[:repos]}</td>"
-                element += "<td>#{user[:issues]}</td></tr>\n"
+                element += "<td>#{user[:followers]}</td><td>#{user[:commits]}</td><td>#{user[:stars]}</td><td>#{user[:repos]}</td><td>#{user[:issues]}</td></tr>\n"
             end
             element += "</tbody>"
             element += "</table> </div>\n"
         end
 
         def initialize(tag_name, text, tokens)
+            
             super
             @technologies = Hash.new
         end
