@@ -112,7 +112,7 @@ module Jekyll
             max_followers = 0
             max_public_repos = 0
             max_issues = 0
-            per_page = 10
+            per_page = 30
 
             (1..2).each do |i|
                 uri = URI.parse("https://api.github.com/search/users?q=location:mexico&followers:>10&per_page=#{per_page}&page=#{i}&sort=followers&order=desc&#{authorization_string}")
