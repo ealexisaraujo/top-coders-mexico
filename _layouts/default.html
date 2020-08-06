@@ -8,6 +8,7 @@
         {%- seo -%}
         {% capture maincss %}{% include custom.scss %}{% endcapture %}
         <script src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.js'></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/ag-grid/23.2.1/ag-grid-community.min.js"></script>
   </head>
 
   <body>
@@ -39,6 +40,9 @@
             </div>
         </div>
         <div class="column Main__Content">
+            <div class='UsersTableContainer'>
+              <div id="myGrid" style="height: 100%" class="ag-theme-alpine"></div>
+            </div>
             {{ content }}
         </div>
     </div>

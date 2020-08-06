@@ -2,6 +2,7 @@ require 'net/http'
 require 'uri'
 require 'json'
 require 'uri'
+require 'dotenv/load'
 
 module Jekyll
     class MeetupMembersCounterTag < Liquid::Tag
@@ -111,20 +112,15 @@ module Jekyll
             max_followers = 0
             max_public_repos = 0
             max_issues = 0
+            per_page = 10
 
             (1..2).each do |i|
-
-                sleep(30)
-
-                uri = URI.parse("https://api.github.com/search/users?q=location:mexico followers:>10&per_page=30x&page=#{i}&sort=followers&order=desc&#{authorization_string}")
+                uri = URI.parse("https://api.github.com/search/users?q=location:mexico&followers:>10&per_page=#{per_page}&page=#{i}&sort=followers&order=desc&#{authorization_string}")
 
                 response = Net::HTTP.get_response(uri)
                 users = JSON.parse(response.body)
 
                 users["items"].each do |user|
-
-                    sleep(5)
-
                     data = getUserData(user["login"])
 
                     p data["name"]
@@ -167,7 +163,7 @@ module Jekyll
                 ) / 5.0
             end
 
-            languages = @technologies.sort_by {|k,v| v}.reverse.first(15).to_h 
+            languages = @technologies.sort_by {|k,v| v}.reverse.first(15).to_h
             sum = languages.values.reduce(:+).to_f
 
             languages.each do |language, value|
@@ -180,22 +176,10 @@ module Jekyll
         def render(context)
             users, languages = getTopUsersData
             element = "<script> draw_languages_chart(" + languages.to_json + ") </script>\n"
-
-            element += "<div class='UsersTableContainer'> <table>\n"
-            element += "<thead><th><td>User</td><td>Info</td><td>Followers</td><td>Commits</td><td>Stars</td><td>Repos</td><td>Issues/PR</td></th><thead>\n"
-            element += "<tbody>"
-            users.each_with_index do |user, i|
-                element += "<tr><td>#{i + 1}</td>"
-                element += "<td><img class='User__image' src='#{user[:pic]}'><br/><a href='#{user[:url]}'>#{user[:id]}</a></td>"
-                element += "<td><b>#{user[:name]}</b><br/>#{user[:email]}<br/><i>#{user[:company]}</i></td>"
-                element += "<td>#{user[:followers]}</td><td>#{user[:commits]}</td><td>#{user[:stars]}</td><td>#{user[:repos]}</td><td>#{user[:issues]}</td></tr>\n"
-            end
-            element += "</tbody>"
-            element += "</table> </div>\n"
+            element += "<script> drawTable(" + users.to_json + ") </script>\n"
         end
 
         def initialize(tag_name, text, tokens)
-            
             super
             @technologies = Hash.new
         end
