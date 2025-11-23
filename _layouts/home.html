@@ -6,12 +6,12 @@ layout: default
 <script>
 
     function getRandomColor() {
-    var letters = '0123456789ABCDEF';
-    var color = '#';
-    for (var i = 0; i < 6; i++) {
-        color += letters[Math.floor(Math.random() * 16)];
-    }
-    return color;
+        var letters = '0123456789ABCDEF';
+        var color = '#';
+        for (var i = 0; i < 6; i++) {
+            color += letters[Math.floor(Math.random() * 16)];
+        }
+        return color;
     }
 
     function getColor(){ 
@@ -20,12 +20,7 @@ layout: default
                 (85 + 10 * Math.random()) + '%)'
     }
 
-    
-
-
     function draw_languages_chart(data) {
-
-
         var keys = Object.keys(data); 
         var labels = keys.map(function(v){ return v + " " + data[v] + "%" });
         var colors = Array(10).fill().map(() => getColor())
@@ -57,6 +52,88 @@ layout: default
             data: languagesData,
             options: options
         });
+    }
+
+    function drawTable(users) {
+        var columnDefs = [
+        {
+          headerName: "",
+          field: "id",
+          sortable: true,
+          width: 10,
+          cellRenderer: (params) => {
+            return `<div class="User__place">
+              ${params.rowIndex + 1}
+            </div>`
+          }
+        },
+        {
+          headerName: "User",
+          field: "pic",
+          width: 110,
+          cellRenderer: (params) => {
+            return `<div class="User__cell">
+              <img class="User__image" src="${params.value}" alt="${params.data.id}">
+              <a href="https://github.com/${params.data.id}" target="_blank">${params.data.id}</a>
+            </div>`
+          }
+        },
+        {
+          headerName: "Info",
+          field: "name",
+          filter: true,
+          cellRenderer: (params) => {
+            console.log(params)
+            return `<div class="User__info">
+              <div class="User__info__details">
+                <b>${params.data.name}</b>
+                ${params.data.email || ''}
+                <i>${params.data.company || ''}</i>
+              </div>
+            </div>`
+          }
+        },
+        {
+          headerName: "Followers",
+          field: "followers",
+          sortable: true
+        },
+        {
+          headerName: "Commits",
+          field: "commits",
+          sortable: true
+        },
+        {
+          headerName: "Stars",
+          field: "stars",
+          sortable: true
+        },
+        {
+          headerName: "Repos",
+          field: "repos",
+          sortable: true
+        },
+        {
+          headerName: "Issues/PR",
+          field: "issues",
+          sortable: true
+        }
+      ];
+
+      // let the grid know which columns and what data to use
+      var gridOptions = {
+        columnDefs: columnDefs,
+        rowData: users,
+        rowHeight: 100
+      };
+      
+      // lookup the container we want the Grid to use
+      var eGridDiv = document.querySelector('#myGrid');
+      
+      // create the grid passing in the div to use together with the columns & data we want to use
+      new agGrid.Grid(eGridDiv, gridOptions);
+      
+      gridOptions.api.sizeColumnsToFit();
     }
 </script>
 

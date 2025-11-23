@@ -5,6 +5,7 @@ GEM
       public_suffix (>= 2.0.2, < 4.0)
     colorator (1.1.0)
     concurrent-ruby (1.1.5)
+    dotenv (2.7.6)
     em-websocket (0.5.1)
       eventmachine (>= 0.12.9)
       http_parser.rb (~> 0.6.0)
@@ -65,8 +66,9 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  dotenv
   jekyll
   minima
 
 BUNDLED WITH
-   1.17.3
+   2.1.4

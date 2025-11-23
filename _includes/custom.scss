@@ -32,8 +32,48 @@
   }
 }
 
-.UsersTableContainer { 
+html, body {
+  height: 100%;
+}
+
+.UsersTableContainer {
     overflow-x: auto;
+    height: 100%;
+}
+
+.User__cell {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: .5rem 0;
+}
+
+.User__info {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  line-height: 20px;
+  height: 100%;
+}
+
+.User__info__details {
+  display: flex;
+  flex-direction: column;
+}
+
+.User__place {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  width: 100%;
+}
+
+.User__image {
+  width: 60px;
+  min-width: 30px;
 }
 
 .Main {
@@ -47,10 +87,17 @@
       min-width: 250px;
       width: 20%;
     }
-    &__Content { 
+    &__Content {
+      width: 50%;
       overflow-x: auto;
     }
-    
+
+    @include breakpoint(xs) {
+      &__Content {
+        width: 100%;
+        overflow-x: auto;
+      }
+    }
 }
 
 .User {
